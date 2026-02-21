@@ -24,6 +24,7 @@ import { buildSlackThreadingToolContext } from "../slack/threading-tool-context.
 import { resolveTelegramAccount } from "../telegram/accounts.js";
 import { escapeRegExp, normalizeE164 } from "../utils.js";
 import { resolveWhatsAppAccount } from "../web/accounts.js";
+import { resolveWeChatAccount } from "../wechat/accounts.js";
 import { normalizeWhatsAppTarget } from "../whatsapp/normalize.js";
 import {
   resolveDiscordGroupRequireMention,
@@ -36,6 +37,8 @@ import {
   resolveSlackGroupToolPolicy,
   resolveTelegramGroupRequireMention,
   resolveTelegramGroupToolPolicy,
+  resolveWeChatGroupRequireMention,
+  resolveWeChatGroupToolPolicy,
   resolveWhatsAppGroupRequireMention,
   resolveWhatsAppGroupToolPolicy,
 } from "./plugins/group-mentions.js";
@@ -124,6 +127,34 @@ const DOCKS: Record<ChatChannelId, ChannelDock> = {
           hasRepliedRef,
         };
       },
+    },
+  },
+  wechat: {
+    id: "wechat",
+    capabilities: {
+      chatTypes: ["direct", "group"],
+      media: true,
+      blockStreaming: true,
+    },
+    outbound: { textChunkLimit: 4000 },
+    config: {
+      resolveAllowFrom: (params) =>
+        (
+          resolveWeChatAccount({ cfg: params.cfg, accountId: params.accountId }).allowFrom ?? []
+        ).map((entry) => String(entry)),
+      formatAllowFrom: ({ allowFrom }) =>
+        allowFrom
+          .map((entry) => String(entry).trim())
+          .filter(Boolean)
+          .map((entry) => entry.replace(/^(wechat|wx):/i, ""))
+          .map((entry) => entry.toLowerCase()),
+    },
+    groups: {
+      resolveRequireMention: resolveWeChatGroupRequireMention,
+      resolveToolPolicy: resolveWeChatGroupToolPolicy,
+    },
+    threading: {
+      resolveReplyToMode: () => "off",
     },
   },
   whatsapp: {

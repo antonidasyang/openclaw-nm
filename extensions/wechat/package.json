@@ -1,0 +1,11 @@
+{
+  "name": "openclaw-wechat",
+  "version": "0.0.1",
+  "description": "WeChat channel plugin for OpenClaw",
+  "type": "module",
+  "main": "index.ts",
+  "openclaw": {
+    "id": "wechat",
+    "type": "channel"
+  }
+}

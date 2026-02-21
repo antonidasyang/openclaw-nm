@@ -398,6 +398,17 @@ export { collectWhatsAppStatusIssues } from "../channels/plugins/status-issues/w
 // Channel: BlueBubbles
 export { collectBlueBubblesStatusIssues } from "../channels/plugins/status-issues/bluebubbles.js";
 
+// Channel: WeChat
+export { listWeChatAccountIds, resolveWeChatAccount } from "../wechat/accounts.js";
+export type {
+  ResolvedWeChatAccount,
+  WeChatConfig,
+  WeChatAccountConfig,
+  WeChatChannelData,
+} from "../wechat/types.js";
+export { wechatOnboardingAdapter } from "../channels/plugins/onboarding/wechat.js";
+export { wechatPlugin } from "../wechat/plugin.js";
+
 // Channel: LINE
 export {
   listLineAccountIds,

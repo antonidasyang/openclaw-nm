@@ -10,6 +10,7 @@ import {
   resolveToolsBySender,
 } from "../../config/group-policy.js";
 import { resolveSlackAccount } from "../../slack/accounts.js";
+import { resolveWeChatAccount } from "../../wechat/accounts.js";
 
 type GroupMentionParams = {
   cfg: OpenClawConfig;
@@ -405,4 +406,67 @@ export function resolveBlueBubblesGroupToolPolicy(
     senderUsername: params.senderUsername,
     senderE164: params.senderE164,
   });
+}
+
+export function resolveWeChatGroupRequireMention(params: GroupMentionParams): boolean {
+  const account = resolveWeChatAccount({
+    cfg: params.cfg,
+    accountId: params.accountId,
+  });
+  const groups = account.groups ?? {};
+  const keys = Object.keys(groups);
+  if (keys.length === 0) {
+    return account.requireMentionInGroups ?? true;
+  }
+  const groupId = params.groupId?.trim();
+  const candidates = [groupId ?? "", "*", ...keys];
+  for (const candidate of candidates) {
+    if (candidate && groups[candidate]) {
+      const groupConfig = groups[candidate];
+      if (typeof groupConfig?.requireMention === "boolean") {
+        return groupConfig.requireMention;
+      }
+    }
+  }
+  return account.requireMentionInGroups ?? true;
+}
+
+export function resolveWeChatGroupToolPolicy(
+  params: GroupMentionParams,
+): GroupToolPolicyConfig | undefined {
+  const account = resolveWeChatAccount({
+    cfg: params.cfg,
+    accountId: params.accountId,
+  });
+  const groups = account.groups ?? {};
+  const keys = Object.keys(groups);
+  if (keys.length === 0) {
+    return undefined;
+  }
+  const groupId = params.groupId?.trim();
+  const candidates = [groupId ?? "", "*", ...keys];
+  let matched:
+    | { tools?: GroupToolPolicyConfig; toolsBySender?: GroupToolPolicyBySenderConfig }
+    | undefined;
+  for (const candidate of candidates) {
+    if (candidate && groups[candidate]) {
+      matched = groups[candidate];
+      break;
+    }
+  }
+  const resolved = matched;
+  const senderPolicy = resolveToolsBySender({
+    toolsBySender: resolved?.toolsBySender,
+    senderId: params.senderId,
+    senderName: params.senderName,
+    senderUsername: params.senderUsername,
+    senderE164: params.senderE164,
+  });
+  if (senderPolicy) {
+    return senderPolicy;
+  }
+  if (resolved?.tools) {
+    return resolved.tools;
+  }
+  return undefined;
 }

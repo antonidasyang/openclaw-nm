@@ -6,6 +6,7 @@ import { requireActivePluginRegistry } from "../plugins/runtime.js";
 // register the plugin in its extension entrypoint and keep protocol IDs in sync.
 export const CHAT_CHANNEL_ORDER = [
   "telegram",
+  "wechat",
   "whatsapp",
   "discord",
   "irc",
@@ -38,6 +39,18 @@ const CHAT_CHANNEL_META: Record<ChatChannelId, ChannelMeta> = {
     selectionDocsPrefix: "",
     selectionDocsOmitLabel: true,
     selectionExtras: [WEBSITE_URL],
+  },
+  wechat: {
+    id: "wechat",
+    label: "WeChat",
+    selectionLabel: "WeChat (Robot API)",
+    detailLabel: "WeChat Robot",
+    docsPath: "/channels/wechat",
+    docsLabel: "wechat",
+    blurb: "custom WeChat robot service integration with webhook support.",
+    systemImage: "chat.bubble",
+    selectionDocsPrefix: "",
+    selectionDocsOmitLabel: false,
   },
   whatsapp: {
     id: "whatsapp",
